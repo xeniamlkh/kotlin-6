@@ -2,6 +2,8 @@
 
 package ru.otus.homework.homework
 
+import kotlin.properties.Delegates
+
 /**
  * Профиль пользователя
  */
@@ -50,4 +52,14 @@ private val emailRegex = Regex("^[A-Za-z](.*)([@])(.+)(\\.)(.+)")
 /**
  * Реализация простого [UserProfile].
  */
-private class ProfileImplementation(override var fullName: String, override var email: String): UserProfile
+//private class ProfileImplementation(override var fullName: String, override var email: String): UserProfile
+
+private class ProfileImplementation(fullNameParam: String, emailParam: String): UserProfile {
+
+    override var fullName: String = fullNameParam
+
+    override var email: String by Delegates.vetoable(emailParam) { property, oldValue, newValue ->
+        emailRegex.matches(newValue)
+    }
+
+}
