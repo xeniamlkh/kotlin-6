@@ -56,7 +56,11 @@ private val emailRegex = Regex("^[A-Za-z](.*)([@])(.+)(\\.)(.+)")
 
 private class ProfileImplementation(fullNameParam: String, emailParam: String): UserProfile {
 
-    override var fullName: String = fullNameParam
+    private val delegate = NonEmptyStringDelegate(fullNameParam)
+
+    override var fullName: String
+        get() = delegate.getValue(this, ::fullName)
+        set(fullNameParam) = delegate.setValue(this, ::fullName, fullNameParam)
 
     override var email: String by Delegates.vetoable(emailParam) { property, oldValue, newValue ->
         emailRegex.matches(newValue)
