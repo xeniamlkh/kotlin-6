@@ -39,7 +39,33 @@ interface UserProfile {
          * Creates user profile with logging
          */
         fun createWithLogging(fullName: String, email: String): UserProfile.Logging {
-            TODO("Implement `createWithLogging` function")
+            val baseProfile = create(fullName = fullName, email = email)
+            val logs = mutableListOf<String>()
+
+            return object : UserProfile.Logging, UserProfile by baseProfile {
+                override fun getLog(): List<String> = logs
+
+                override var fullName: String
+                    get() = baseProfile.fullName
+                    set(value) {
+                        val old = baseProfile.fullName
+                        baseProfile.fullName = value
+                        if (old != baseProfile.fullName) {
+                            logs += "Changing `fullName` from '$old' to '${baseProfile.fullName}'"
+                        }
+                    }
+
+                override var email: String
+                    get() = baseProfile.email
+                    set(value) {
+                        val old = baseProfile.email
+                        baseProfile.email = value
+                        if (old != baseProfile.email) {
+                            logs += "Changing `email` from '$old' to '${baseProfile.email}'"
+                        }
+                    }
+            }
+
         }
     }
 }
@@ -54,7 +80,7 @@ private val emailRegex = Regex("^[A-Za-z](.*)([@])(.+)(\\.)(.+)")
  */
 //private class ProfileImplementation(override var fullName: String, override var email: String): UserProfile
 
-private class ProfileImplementation(fullNameParam: String, emailParam: String): UserProfile {
+private class ProfileImplementation(fullNameParam: String, emailParam: String) : UserProfile {
 
     private val delegate = NonEmptyStringDelegate(fullNameParam)
 
